@@ -1,0 +1,25 @@
+{
+	"id": "cirno",
+	"name": "琪露诺",
+	
+	"size": "40dp",
+	
+	"actions": {
+		"default": "idle",
+		"idle": "idle.js",
+		"walk": "walk.js",
+		"circles": "circles.js",
+		"spin": "spin.js",
+		"fall": "fall.js",
+		"down": "down.js"
+	},
+	
+	"motions": {
+		"idle": "idle",
+		"walk_front": "walk_front",
+		"circles": "circles",
+		"spin": "spin",
+		"fall": "fall",
+		"down": "down"
+	}
+}

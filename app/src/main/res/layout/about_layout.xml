@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_height="wrap_content"
+     android:layout_width="match_parent"
+     app:cardElevation="4dp"
+     app:cardCornerRadius="16dp"
+     android:id="@+id/about_card">
+
+    <LinearLayout
+         android:layout_height="wrap_content"
+         android:layout_width="match_parent"
+         android:orientation="vertical">
+
+        <RelativeLayout
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:padding="16dp">
+
+            <TextView
+                 android:layout_height="wrap_content"
+                 android:layout_width="wrap_content"
+                 android:layout_centerVertical="true"
+                 android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                 android:text="关于" />
+
+            <com.google.android.material.button.MaterialButton
+                 android:layout_height="48dp"
+                 android:layout_width="48dp"
+                 app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                 android:contentDescription="关闭"
+                 android:layout_centerVertical="true"
+                 android:layout_alignParentEnd="true"
+                 app:iconTint="?attr/colorOnSurfaceVariant"
+                 style="@style/Widget.Material3.Button.IconButton"
+                 android:id="@+id/btn_close_about" />
+
+        </RelativeLayout>
+
+        <ScrollView
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:maxHeight="400dp"
+             android:paddingBottom="24dp"
+             android:paddingHorizontal="24dp">
+
+            <LinearLayout
+                 android:layout_height="wrap_content"
+                 android:layout_width="match_parent"
+                 android:gravity="center_horizontal"
+                 android:orientation="vertical">
+
+                <ImageView
+                     android:layout_height="64dp"
+                     android:layout_width="64dp"
+                     android:src="@mipmap/ic_launcher"
+                     android:contentDescription="应用图标"
+                     android:layout_marginTop="16dp" />
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                     android:layout_marginTop="16dp"
+                     android:text="Baka Pet" />
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:textAppearance="?attr/textAppearanceBodyMedium"
+                     android:textColor="?attr/colorOnSurfaceVariant"
+                     android:layout_marginTop="8dp"
+                     android:text="版本 1.3.0" />
+
+                <View
+                     android:layout_height="1dp"
+                     android:layout_width="match_parent"
+                     android:layout_marginVertical="24dp"
+                     android:background="?attr/colorOutline" />
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:layout_marginBottom="4dp"
+                     android:textAppearance="?attr/textAppearanceTitleMedium"
+                     android:text="开发者" />
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:layout_marginBottom="8dp"
+                     android:textAppearance="?attr/textAppearanceBodyMedium"
+                     android:textColor="?attr/colorOnSurfaceVariant"
+                     android:text="9halfcirno" />
+
+                <com.google.android.material.textview.MaterialTextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:textAppearance="?attr/textAppearanceBodyMedium"
+                     android:textColor="?attr/colorOnSurfaceVariant"
+                     android:text="内置桌宠素材均来自《东方非想天则》\n\n这个软件只是我看手机上的车万桌宠太少了(我只知道一个觉的)所以来了兴致做了一个\n\n我第一次开发安卓App，做得不好的地方请见谅…\n\n该软件部分代码由AI辅助生成" />
+
+                <TextView
+                     android:layout_height="wrap_content"
+                     android:layout_width="wrap_content"
+                     android:gravity="center"
+                     android:textAppearance="?attr/textAppearanceBodySmall"
+                     android:textColor="?attr/colorOnSurfaceVariant"
+                     android:layout_marginTop="24dp"
+                     android:text="© 2026 9halfcirno\n保留所有权利" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

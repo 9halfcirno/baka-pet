@@ -1,0 +1,15 @@
+{
+	"id": "suika",
+	"name": "伊吹萃香",
+	
+	"size": "50dp",
+	
+	"actions": {
+		"default": "run",
+		"run": "run.js"
+	},
+	
+	"motions": {
+		"run": "run"
+	}
+}
