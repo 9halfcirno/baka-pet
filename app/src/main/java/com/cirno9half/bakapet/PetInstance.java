@@ -13,6 +13,13 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.Paint;
+import android.os.Looper;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.widget.TextView;
 
 public class PetInstance {
 
@@ -41,6 +48,17 @@ public class PetInstance {
     private boolean isLongPressed = false;
     private Runnable longPressRunnable;
     private float savedDownParamsX, savedDownParamsY; // 记录按下时的窗口坐标，便于拖动
+// 气泡相关
+    private TextView bubbleView;
+    private WindowManager.LayoutParams bubbleParams;
+    private boolean isSaying = false;
+    private String currentBubbleText;
+    private int typewriterIndex;
+    private Runnable typewriterRunnable;
+    private Runnable dismissRunnable;
+    private static final int TYPEWRITER_INTERVAL = 50; // ms
+    private static final long DISPLAY_AFTER_FINISH = 2000L; // 说完后停留 2 秒
+    private final Handler bubbleHandler = new Handler(Looper.getMainLooper());
 
     public PetInstance(PetService service, int instanceId, String assetPath,
             String petVarName, Handler mainHandler, JSContext jsContext) {
@@ -51,7 +69,6 @@ public class PetInstance {
         this.petVarName = petVarName;
         this.mainHandler = mainHandler;
         this.wm = service.getWm();
-
 
         petView = new PetView(service);
         params = new WindowManager.LayoutParams(
@@ -76,7 +93,6 @@ public class PetInstance {
         external
         );
         actionController = new ActionController(this, jsContext, petVarName);
-
     }
 
     public void init() {
@@ -134,6 +150,7 @@ public class PetInstance {
                         params.y = (int) (e.getRawY() - downY + savedDownParamsY);
                         wm.updateViewLayout(petView, params);
                     }
+                    updateBubblePosition();
                     break;
 
                 case MotionEvent.ACTION_UP:
@@ -229,13 +246,167 @@ public class PetInstance {
     public void setPosition(int x, int y) {
         params.x = x;
         params.y = y;
-        mainHandler.post(() -> wm.updateViewLayout(petView, params));
+        mainHandler.post(() -> {
+            wm.updateViewLayout(petView, params);
+            updateBubblePosition();
+        });
     }
 
     public void move(int dx, int dy) {
         params.x += dx;
         params.y += dy;
-        mainHandler.post(() -> wm.updateViewLayout(petView, params));
+        mainHandler.post(() -> {
+            wm.updateViewLayout(petView, params);
+            updateBubblePosition();
+        });
+    }
+
+    public void say(String text) {
+        if (text == null || text.isEmpty()) return;
+
+        // 如果正在说话，直接替换内容，重置打字机
+        if (isSaying) {
+            stopTypewriter();
+        }
+
+        currentBubbleText = text;
+        typewriterIndex = 0;
+        isSaying = true;
+
+        // 确保气泡存在
+        if (bubbleView == null) {
+            createBubble();
+            updateBubblePosition();
+        }
+
+        // 开始打字机效果
+        updateBubblePosition();
+        typewriterRunnable = new Runnable() {
+            @Override
+            public void run() {
+                typewriterIndex++;
+                if (bubbleView != null) {
+                    String part = currentBubbleText.substring(0, Math.min(typewriterIndex, currentBubbleText.length()));
+                    bubbleView.setText(part);
+                }
+                if (typewriterIndex < currentBubbleText.length()) {
+                    bubbleHandler.postDelayed(this, TYPEWRITER_INTERVAL);
+                } else {
+                    // 打字完成，启动停留计时器
+                    dismissRunnable = () -> dismissBubble();
+                    bubbleHandler.postDelayed(dismissRunnable, DISPLAY_AFTER_FINISH);
+                }
+            }
+        };
+        bubbleHandler.post(typewriterRunnable);
+
+        // 显示气泡（如果之前隐藏了）
+        if (bubbleView.getVisibility() != View.VISIBLE) {
+            bubbleView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void createBubble() {
+        bubbleView = new TextView(service);
+        bubbleView.setTextColor(Color.BLACK);
+        bubbleView.setTextSize(14);
+        bubbleView.setPadding(16, 8, 16, 8);
+
+        // 背景：白色圆角矩形带阴影
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.WHITE);
+        bg.setCornerRadius(16);
+        bg.setStroke(1, Color.GRAY);
+        // 设置阴影 (API 29 以下需要 setLayerType)
+        bubbleView.setBackground(bg);
+        bubbleView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        bubbleView.setElevation(4); // 投影
+
+        // 窗口参数：不拦截触摸，跟随宠物移动
+        bubbleParams = new WindowManager.LayoutParams(
+        WindowManager.LayoutParams.WRAP_CONTENT,
+        WindowManager.LayoutParams.WRAP_CONTENT,
+        Build.VERSION.SDK_INT >= 26 ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                : WindowManager.LayoutParams.TYPE_PHONE,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+        PixelFormat.TRANSLUCENT);
+        bubbleParams.gravity = Gravity.TOP | Gravity.LEFT;
+
+        wm.addView(bubbleView, bubbleParams);
+        updateBubblePosition(); // 初始定位
+    }
+
+    private void stopTypewriter() {
+        if (typewriterRunnable != null) {
+            bubbleHandler.removeCallbacks(typewriterRunnable);
+        }
+        if (dismissRunnable != null) {
+            bubbleHandler.removeCallbacks(dismissRunnable);
+        }
+    }
+
+    private void dismissBubble() {
+        stopTypewriter();
+        if (bubbleView != null) {
+            bubbleView.setVisibility(View.GONE);
+        }
+        isSaying = false;
+        currentBubbleText = null;
+    }
+
+    private void updateBubblePosition() {
+        if (bubbleView == null) return;
+
+        // 宠物当前位置
+        int petX = params.x;
+        int petY = params.y;
+        int petW = params.width;
+        int petH = params.height;
+
+        int bubbleW, bubbleH;
+
+        // 如果正在说话，用完整文本估算宽度（避免测量空字符串或碎片文本）
+        if (isSaying && currentBubbleText != null && !currentBubbleText.isEmpty()) {
+            // 计算文本宽度
+            float textWidth = bubbleView.getPaint().measureText(currentBubbleText);
+            int paddingLeft = bubbleView.getPaddingLeft();
+            int paddingRight = bubbleView.getPaddingRight();
+            bubbleW = (int) (textWidth + paddingLeft + paddingRight + 0.5f);
+            // 文本高度可用单行高度估算
+            Paint.FontMetrics fm = bubbleView.getPaint().getFontMetrics();
+            bubbleH = (int) (fm.bottom - fm.top + bubbleView.getPaddingTop() + bubbleView.getPaddingBottom() + 0.5f);
+        } else {
+            // 无说话状态，使用视图当前测量（此时可能有宽度，如之前显示过）
+            bubbleW = bubbleView.getMeasuredWidth();
+            bubbleH = bubbleView.getMeasuredHeight();
+            if (bubbleW <= 0) {
+                // 如果从未测量过，给个最小值防止算到屏幕外
+                bubbleW = 100;
+                bubbleH = 40;
+            }
+        }
+
+        // 默认位置：宠物正上方，偏移 8px
+        int bubbleX = petX + (petW - bubbleW) / 2;
+        int bubbleY = petY - bubbleH - 8;
+
+        // 屏幕边界修正
+        DisplayMetrics dm = service.getResources().getDisplayMetrics();
+        int screenW = dm.widthPixels;
+        int screenH = dm.heightPixels;
+
+        if (bubbleX < 0) bubbleX = 0;
+        if (bubbleX + bubbleW > screenW) bubbleX = screenW - bubbleW;
+        if (bubbleY < 0) {
+            bubbleY = petY + petH + 8;
+            if (bubbleY + bubbleH > screenH) {
+                bubbleY = screenH - bubbleH;
+            }
+        }
+
+        bubbleParams.x = bubbleX;
+        bubbleParams.y = bubbleY;
+        wm.updateViewLayout(bubbleView, bubbleParams);
     }
 
     public int getX() {
@@ -256,6 +427,10 @@ public class PetInstance {
 
     public boolean isDragging() {
         return dragging;
+    }
+
+    public boolean isSaying() {
+        return isSaying;
     }
 
     public void setScaleX(float sx) {
@@ -316,6 +491,11 @@ public class PetInstance {
 
     public void destroy() {
         mainHandler.removeCallbacksAndMessages(null);
+        bubbleHandler.removeCallbacksAndMessages(null);
+        if (bubbleView != null) {
+            wm.removeView(bubbleView);
+            bubbleView = null;
+        }
         wm.removeView(petView);
         actionController.destroy();
         petView.clearCache();

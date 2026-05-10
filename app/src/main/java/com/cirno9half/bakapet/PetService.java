@@ -377,6 +377,28 @@ public class PetService extends Service {
                 JSValueHelper.close(args);
             }
         }, "_playAudio" + suffix);
+
+        // say 方法
+        jsContext.registerJavaMethod((receiver, args) -> {
+            try {
+                String message = args.getString(0);
+                PetInstance inst = instanceMap.get(instanceId);
+                if (inst != null) inst.say(message);
+                return null;
+            } finally {
+                JSValueHelper.close(args);
+            }
+        }, "_say" + suffix);
+
+// isSaying 只读属性
+        jsContext.registerJavaMethod((receiver, args) -> {
+            try {
+                PetInstance inst = instanceMap.get(instanceId);
+                return inst != null && inst.isSaying();
+            } finally {
+                JSValueHelper.close(args);
+            }
+        }, "_isSaying" + suffix);
     }
 
     /** 根据桌宠屏幕位置播放双声道音频 */
@@ -443,11 +465,13 @@ public class PetService extends Service {
                         "  action: { switchTo: _actionSwitchTo%2$s },\n" +
                         "  playAudio: _playAudio%2$s,\n" +
                         "  _view: {},\n" +
-                        "  getImageView: function() { return this._view; }\n" +
+                        "  getImageView: function() { return this._view; },\n" +
+                        "  say: _say" + suffix + "\n" +
                         "};\n" +
                         "Object.defineProperty(%1$s, 'dragging', { get: _dragging%2$s });\n" +
                         "Object.defineProperty(%1$s, 'x', { get: _getX%2$s });\n" +
                         "Object.defineProperty(%1$s, 'y', { get: _getY%2$s });\n" +
+                        "Object.defineProperty(%1$s, 'isSaying', { get: _isSaying%2$s });\n" +
                         "Object.defineProperty(%1$s.animation, 'isLastFrame', { get: _isLastFrame%2$s });\n" +
                         "Object.defineProperty(%1$s._view, 'width', { get: _getImgWidth%2$s });\n" +
                         "Object.defineProperty(%1$s._view, 'height', { get: _getImgHeight%2$s });\n" +
@@ -460,8 +484,6 @@ public class PetService extends Service {
         jsContext.executeVoidScript(script, "pet_init_" + instanceId);
         return varName;
     }
-
-
 
     public Pet addPet(String assetPath) {
         int id = nextId++;
@@ -598,7 +620,6 @@ public class PetService extends Service {
         if (hasSingleRoot) {
             rootFolder = topLevels.iterator().next();
         }
-
 
         ZipInputStream zis = new ZipInputStream(
         new FileInputStream(zipPath)

@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         // 关闭按钮
         MaterialButton btnCloseAbout = aboutWindow.findViewById(R.id.btn_close_about);
         btnCloseAbout.setOnClickListener(v -> aboutWindow.dismiss());
-        
+
         // 左上角信息图标点击显示窗口
         MaterialButton btnAbout = findViewById(R.id.btn_about);
         btnAbout.setOnClickListener(v -> aboutWindow.show());

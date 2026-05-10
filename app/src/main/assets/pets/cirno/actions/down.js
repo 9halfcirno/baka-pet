@@ -1,6 +1,7 @@
 action = {
 	start(pet) {
 		pet.animation.switchTo("down");
+		pet.say("啊呀！")
 	},
 
 	update(pet) {

@@ -1,72 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/setting_card"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp">
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/setting_card"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	app:cardCornerRadius="16dp"
+	app:cardElevation="4dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
 
-        <!-- 标题栏 -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+		<!-- 标题栏 -->
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="设置"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:text="设置"
+				android:textAppearance="?attr/textAppearanceHeadlineSmall" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_close_setting"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:contentDescription="关闭"
-                app:icon="@android:drawable/ic_menu_close_clear_cancel" />
 
-        </RelativeLayout>
+			<com.google.android.material.button.MaterialButton
+				android:id="@+id/btn_close_setting"
+				style="@style/Widget.Material3.Button.IconButton"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:layout_alignParentEnd="true"
+				android:layout_centerVertical="true"
+				android:contentDescription="关闭"
+				app:icon="@android:drawable/ic_menu_close_clear_cancel" />
 
-        <!-- 设置项区域（可滚动） -->
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxHeight="400dp"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="16dp">
+		</RelativeLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+		<!-- 设置项区域（可滚动） -->
+		<ScrollView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:maxHeight="400dp"
+			android:paddingHorizontal="16dp"
+			android:paddingBottom="16dp">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switch_notification"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="通知开关" />
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switch_night_mode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="夜间模式" />
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:gravity="center_vertical"
+					android:paddingVertical="8dp">
+					
+					<ImageView
+						android:id="@+id/iv_info_notification"
+						android:layout_width="24dp"
+						android:layout_height="24dp"
+						android:src="@android:drawable/ic_menu_info_details"
+						android:contentDescription="信息提示"
+						android:clickable="true"
+						android:focusable="true"
+						android:tooltipText="开启后，桌宠会发送每日通知" />
+					
+					<com.google.android.material.switchmaterial.SwitchMaterial
+						android:id="@+id/switch_notification"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:text="通知开关" />
+				</LinearLayout>
+				
+				<com.google.android.material.switchmaterial.SwitchMaterial
+					android:id="@+id/switch_night_mode"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="16dp"
+					android:text="夜间模式" />
 
-            </LinearLayout>
+			</LinearLayout>
 
-        </ScrollView>
+		</ScrollView>
 
-    </LinearLayout>
+	</LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
