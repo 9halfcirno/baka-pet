@@ -8,7 +8,7 @@ module.exports = {
 	update(pet) {
 		if (pet.animation.isLastFrame) {
 			//pet.playAudio("touch.wav")
-			pet.action.switchTo("idle")
+			pet.action.switchTo("idle");
 		}
 	}
 }

@@ -264,23 +264,29 @@ public class PetInstance {
     public void say(String text) {
         if (text == null || text.isEmpty()) return;
 
-        // 如果正在说话，直接替换内容，重置打字机
+        // 1. 如果有正在进行的说话，停止它
         if (isSaying) {
             stopTypewriter();
         }
 
+        // 2. 立即更新当前完整文本（用于后续定位）
         currentBubbleText = text;
         typewriterIndex = 0;
         isSaying = true;
 
-        // 确保气泡存在
+        // 3. 确保气泡视图存在
         if (bubbleView == null) {
             createBubble();
-            updateBubblePosition();
         }
 
-        // 开始打字机效果
+        // 4. 基于新的文本长度重新计算气泡位置（此时测量宽度是短文本宽度）
         updateBubblePosition();
+
+        // 5. 清空视图并显示
+        bubbleView.setText("");
+        bubbleView.setVisibility(View.VISIBLE);
+
+        // 6. 启动打字机动画（保持不变）
         typewriterRunnable = new Runnable() {
             @Override
             public void run() {
@@ -292,18 +298,12 @@ public class PetInstance {
                 if (typewriterIndex < currentBubbleText.length()) {
                     bubbleHandler.postDelayed(this, TYPEWRITER_INTERVAL);
                 } else {
-                    // 打字完成，启动停留计时器
                     dismissRunnable = () -> dismissBubble();
                     bubbleHandler.postDelayed(dismissRunnable, DISPLAY_AFTER_FINISH);
                 }
             }
         };
         bubbleHandler.post(typewriterRunnable);
-
-        // 显示气泡（如果之前隐藏了）
-        if (bubbleView.getVisibility() != View.VISIBLE) {
-            bubbleView.setVisibility(View.VISIBLE);
-        }
     }
 
     private void createBubble() {
